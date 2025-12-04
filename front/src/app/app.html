@@ -1,0 +1,134 @@
+<header class="bg-white shadow flex items-center justify-between px-6 py-4">
+  <div class="flex items-center gap-3">
+    <img src="favicon.ico" alt="Logo" class="w-10 h-10 rounded-full border border-gray-300">
+    <span class="text-2xl font-bold text-blue-700 tracking-wide">CrossoverX</span>
+  </div>
+
+  <button (click)="openCart()" class="relative focus:outline-none" aria-label="Abrir carrito">
+    <svg class="w-8 h-8 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007.6 17h8.8a1 1 0 00.95-1.3L17 13M7 13V6a1 1 0 011-1h9a1 1 0 011 1v7">
+      </path>
+    </svg>
+    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2">
+      {{ getTotalQuantity() }}
+    </span>
+  </button>
+</header>
+
+<main class="max-w-6xl mx-auto py-8 px-4">
+  <h2 class="text-xl font-semibold mb-6 text-gray-700">Camisetas ACB</h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <div *ngFor="let p of products" class="bg-white rounded-lg shadow p-4 flex flex-col items-center text-center">
+
+      <button (click)="openProduct(p)" class="w-full focus:outline-none">
+        <img [src]="p.image" [alt]="p.name" class="w-40 h-40 object-contain mb-3 rounded mx-auto">
+        <h4 class="font-bold text-lg text-gray-800 mb-1">{{ p.name }}</h4>
+        <span class="text-blue-700 font-semibold mb-3 block">{{ p.price | number:'1.2-2' }} €</span>
+      </button>
+
+      <div class="w-full mt-auto">
+        <button class="w-full bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 font-semibold"
+          (click)="openProduct(p)">Ver detalles</button>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- MODAL PRODUCTO -->
+<div class="modal" [class.show]="productModalOpen">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full mx-4 p-6 relative">
+
+    <button (click)="closeProduct()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+      ✕
+    </button>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex items-center justify-center">
+        <img [src]="selectedProduct?.image" class="max-h-56 object-contain">
+      </div>
+
+      <div>
+        <h3 class="text-2xl font-bold mb-1">{{ selectedProduct?.name }}</h3>
+        <p class="text-blue-700 font-semibold mb-4">
+          {{ selectedProduct?.price | number:'1.2-2' }} €
+        </p>
+
+        <label class="block text-sm font-medium text-gray-600">Cantidad</label>
+        <input type="number" [(ngModel)]="quantity" min="1"
+               class="w-full border rounded px-3 py-2 mb-3">
+
+        <label class="block text-sm font-medium text-gray-600">Nombre personalizado</label>
+        <input type="text" [(ngModel)]="customName"
+               class="w-full border rounded px-3 py-2 mb-4">
+
+        <div class="flex items-center gap-3">
+          <button (click)="addToCart()" class="flex-1 bg-blue-700 text-white py-2 rounded font-semibold hover:bg-blue-800">
+            Añadir al carrito
+          </button>
+          <button (click)="closeProduct()" class="px-4 py-2 rounded border hover:bg-gray-50">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL CARRITO -->
+<div class="modal" [class.show]="cartModalOpen">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 p-6 relative">
+
+    <button (click)="closeCart()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+      ✕
+    </button>
+
+    <h3 class="text-lg font-bold mb-4 text-blue-700">Tu carrito</h3>
+
+    <div *ngIf="cart.length === 0" class="text-gray-500">El carrito está vacío.</div>
+
+    <div *ngFor="let item of cart; let i = index" class="flex items-center justify-between mb-3">
+
+      <div class="flex items-center gap-3">
+        <img [src]="item.image" class="w-16 h-16 object-contain rounded">
+        <div>
+          <div class="font-semibold">
+            {{ item.name }}
+            <span *ngIf="item.customName" class="text-sm text-gray-500">
+              ({{ item.customName }})
+            </span>
+          </div>
+          <div class="text-xs text-gray-500">x{{ item.qty }}</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="text-blue-700 font-semibold">
+          {{ (item.price * item.qty) | number:'1.2-2' }} €
+        </div>
+
+        <button (click)="removeItem(i)" class="text-red-500 hover:text-red-700 text-lg">×</button>
+      </div>
+
+    </div>
+
+    <div class="flex justify-between items-center mb-4">
+      <span class="font-semibold">Total:</span>
+      <span class="text-xl font-bold text-blue-700">{{ getTotal() | number:'1.2-2' }} €</span>
+    </div>
+
+    <div class="flex gap-3">
+      <button (click)="checkout()" class="flex-1 bg-blue-700 text-white py-2 rounded font-semibold hover:bg-blue-800">
+        Pagar
+      </button>
+
+      <button (click)="clearCart()" class="px-4 py-2 rounded border hover:bg-gray-50">
+        Vaciar
+      </button>
+    </div>
+
+  </div>
+</div>
