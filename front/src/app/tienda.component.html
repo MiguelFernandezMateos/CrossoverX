@@ -1,0 +1,76 @@
+<main class="max-w-7xl mx-auto py-8 px-4">
+  <h2 class="text-3xl font-bold mb-8 text-blue-700">🏀 Camisetas ACB</h2>
+
+  <!-- Indicador de carga -->
+  <div *ngIf="loading" class="text-center py-12">
+    <p class="text-gray-500 text-lg">Cargando productos...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <p class="text-red-700">{{ error }}</p>
+  </div>
+
+  <!-- Grid de productos -->
+  <div *ngIf="!loading && products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div *ngFor="let product of products" 
+      class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+      (click)="openProduct(product)">
+      
+      <!-- Imagen -->
+      <div class="relative bg-gray-100 h-48 flex items-center justify-center overflow-hidden">
+        <img *ngIf="product.imageUrl" 
+          [src]="product.imageUrl" 
+          [alt]="product.name"
+          class="w-full h-full object-cover hover:scale-105 transition-transform">
+        <div *ngIf="!product.imageUrl" class="text-gray-400 text-center">
+          <p class="text-sm">Sin imagen</p>
+        </div>
+        
+        <!-- Badge de stock -->
+        <div class="absolute top-2 right-2">
+          <span [ngClass]="'px-3 py-1 rounded-full text-xs font-bold text-white ' + 
+            (product.stock > 40 ? 'bg-green-500' : product.stock > 20 ? 'bg-yellow-500' : 'bg-red-500')">
+            {{ getStockStatus(product.stock) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Contenido -->
+      <div class="p-4">
+        <!-- Equipo -->
+        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">{{ product.teamName }}</p>
+        
+        <!-- Nombre -->
+        <h3 class="font-bold text-gray-800 mb-2 line-clamp-2">{{ product.name }}</h3>
+        
+        <!-- Especificaciones -->
+        <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+          <div class="bg-gray-50 p-2 rounded">
+            <p class="text-gray-600 text-xs">Talla</p>
+            <p class="font-bold text-blue-700">{{ product.sizeCode }}</p>
+          </div>
+          <div class="bg-gray-50 p-2 rounded">
+            <p class="text-gray-600 text-xs">Stock</p>
+            <p [ngClass]="'font-bold ' + getStockColor(product.stock)">{{ product.stock }} ud</p>
+          </div>
+        </div>
+
+        <!-- Precio -->
+        <div class="border-t pt-3 flex items-center justify-between">
+          <span class="text-2xl font-bold text-blue-700">{{ product.price | number:'1.2-2' }}€</span>
+          <button 
+            class="bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold hover:bg-blue-800 transition text-sm"
+            (click)="$event.stopPropagation(); openProduct(product)">
+            Ver
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sin productos -->
+  <div *ngIf="!loading && products.length === 0" class="text-center py-12">
+    <p class="text-gray-500 text-lg">No hay productos disponibles</p>
+  </div>
+</main>
