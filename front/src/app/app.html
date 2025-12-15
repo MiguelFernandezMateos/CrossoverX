@@ -7,22 +7,15 @@
   <div class="flex items-center gap-4">
     <button 
       *ngIf="currentUser?.isAdmin"
-      (click)="goToDashboard()" 
-      class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition">
-      📊 Dashboard
-    </button>
-
-    <button 
-      *ngIf="currentUser?.isAdmin"
       (click)="openStockModal()" 
       class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
       📦 Gestionar Stock
     </button>
 
     <div class="flex items-center gap-2">
-      <span *ngIf="currentUser" class="text-sm text-gray-600">
-        {{ currentUser.email }}
-        <span *ngIf="currentUser.isAdmin" class="ml-1 bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">Admin</span>
+      <span *ngIf="currentUser" class="text-sm text-white bg-blue-600 px-3 py-1 rounded-lg font-semibold">
+        ✓ {{ currentUser.email }}
+        <span *ngIf="currentUser.isAdmin" class="ml-2 bg-yellow-400 text-gray-900 px-2 py-0.5 rounded text-xs font-bold">Admin</span>
       </span>
       <button 
         *ngIf="!currentUser"
@@ -74,8 +67,19 @@
         <h3 class="text-2xl font-bold mb-1">{{ selectedProduct?.name }}</h3>
         <p class="text-blue-700 font-semibold mb-4">{{ selectedProduct?.price | number:'1.2-2' }} €</p>
 
-        <!-- Stock admin -->
+        <!-- Stock admin - Editable -->
         <div *ngIf="currentUser?.isAdmin" class="mb-4 p-3 bg-yellow-50 border border-yellow-300 rounded">
+          <label class="block text-sm font-medium text-gray-700 mb-2">📦 Gestionar Stock:</label>
+          <div class="flex items-center gap-2">
+            <input type="number" [(ngModel)]="selectedProduct!.stock" min="0" class="flex-1 border rounded px-3 py-2">
+            <button (click)="saveStock()" class="bg-green-600 text-white px-4 py-2 rounded font-semibold hover:bg-green-700">
+              Guardar
+            </button>
+          </div>
+        </div>
+
+        <!-- Stock display para no-admin -->
+        <div *ngIf="!currentUser?.isAdmin" class="mb-4 p-3 bg-blue-50 border border-blue-300 rounded">
           <label class="block text-sm font-medium text-gray-700 mb-2">📦 Stock Disponible:</label>
           <p class="text-lg font-bold text-blue-700">{{ selectedProduct?.stock }} unidades</p>
         </div>
